@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            max-width: 100%;
+            max-height: 100%;
+            overflow: hidden;
+            background: transparent;
+            scrollbar-width: none;
+        }
+
+            html::-webkit-scrollbar,
+            body::-webkit-scrollbar {
+                display: none;
+            }
+
+        body {
+            display: flex;
+            align-items: stretch;
+            justify-content: stretch;
+            overflow: hidden;
+            padding: 3px;
+        }
+
+        :root {
+            --btn-bg: #a8c4f0;
+            --btn-text: #6a06b3;
+            --btn-border-color: transparent;
+            --btn-border-width: 0px;
+            --btn-border-radius: 18px;
+        }
+
+        .custom-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex: 1;
+            min-width: 0;
+            min-height: 0;
+            background-color: var(--btn-bg);
+            color: var(--btn-text);
+            /* box-shadow inset en lugar de border — no ocupa espacio, nunca se recorta */
+            border: none;
+            box-shadow: inset 0 0 0 var(--btn-border-width) var(--btn-border-color);
+            border-radius: var(--btn-border-radius);
+            font-weight: bold;
+            font-family: Georgia, 'Times New Roman', serif;
+            cursor: pointer;
+            user-select: none;
+            transition: background-color 0.15s ease, transform 0.1s ease;
+            outline: none;
+            text-align: center;
+            font-size: 16px;
+        }
+
+            .custom-btn:hover {
+                background-color: color-mix(in srgb, var(--btn-bg) 85%, black);
+            }
+
+            .custom-btn:active {
+                background-color: color-mix(in srgb, var(--btn-bg) 72%, black);
+                transform: scale(0.98);
+            }
+    </style>
+</head>
+<body>
+
+    <button class="custom-btn" id="mainBtn">
+        Ver Analisis Previos
+    </button>
+
+    <script>
+        const btn = document.getElementById('mainBtn');
+        const root = document.documentElement;
+
+        // ── Tamaño de fuente adaptativo ──────────────────────────────
+        function adjustFontSize() {
+            const size = Math.min(btn.offsetWidth * 0.10, btn.offsetHeight * 0.38);
+            btn.style.fontSize = size + 'px';
+        }
+        window.addEventListener('load', adjustFontSize);
+        if (window.ResizeObserver) {
+            new ResizeObserver(adjustFontSize).observe(btn);
+        } else {
+            window.addEventListener('resize', adjustFontSize);
+        }
+
+        // ── Aplicar estilos (acepta objeto parcial o completo) ────────
+        function setButtonStyle(options) {
+            if (!options) return;
+
+            if (options.bgColor !== undefined)
+                root.style.setProperty('--btn-bg', options.bgColor);
+
+            if (options.textColor !== undefined)
+                root.style.setProperty('--btn-text', options.textColor);
+
+            if (options.borderColor !== undefined)
+                root.style.setProperty('--btn-border-color', options.borderColor);
+
+            if (options.borderWidth !== undefined)
+                root.style.setProperty('--btn-border-width', options.borderWidth);
+
+            if (options.borderRadius !== undefined)
+                root.style.setProperty('--btn-border-radius', options.borderRadius);
+
+            if (options.label !== undefined) {
+                btn.textContent = options.label;
+                adjustFontSize();
+            }
+        }
+
+        // ── Integración con MATLAB ────────────────────────────────────
+        //
+        //  CAMBIAR TODAS LAS PROPIEDADES A LA VEZ:
+        //    htmlComp.Data = struct( ...
+        //      'bgColor',      '#a8c4f0', ...
+        //      'textColor',    '#6a06b3', ...
+        //      'borderColor',  '#6a06b3', ...
+        //      'borderWidth',  '3px',     ...
+        //      'borderRadius', '30px',    ...
+        //      'label',        'Nuevo texto' ...
+        //    );
+        //
+        //  CAMBIAR UNA SOLA PROPIEDAD:
+        //    htmlComp.Data = struct('bgColor',      '#ff0000');
+        //    htmlComp.Data = struct('textColor',    '#ffffff');
+        //    htmlComp.Data = struct('borderColor',  '#000000');
+        //    htmlComp.Data = struct('borderWidth',  '2px');
+        //    htmlComp.Data = struct('borderRadius', '30px');
+        //    htmlComp.Data = struct('label',        'Buscar');
+        //
+        function setup(htmlComponent) {
+
+            // Escucha cambios en .Data (parciales o completos)
+            htmlComponent.addEventListener('DataChanged', function (event) {
+                setButtonStyle(event.Data);
+            });
+
+            // Envía el clic a MATLAB
+            btn.addEventListener('click', function () {
+                htmlComponent.sendEventToMATLAB('ButtonClicked', btn.textContent.trim());
+            });
+        }
+    </script>
+
+</body>
+</html>

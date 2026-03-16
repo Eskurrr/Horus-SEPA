@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: transparent;
+        }
+
+        body {
+            display: flex;
+            align-items: stretch;
+            justify-content: stretch;
+        }
+
+        .buscar-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.4em;
+            background-color: #a8c4f0;
+            color: #6a06b3;
+            border: none;
+            border-radius: 18px;
+            font-weight: bold;
+            font-family: Georgia, 'Times New Roman', serif;
+            cursor: pointer;
+            user-select: none;
+            transition: background-color 0.15s ease, transform 0.1s ease;
+            width: 100%;
+            height: 100%;
+            font-size: 16px;
+        }
+
+            .buscar-btn:hover {
+                background-color: #90b4ec;
+            }
+
+            .buscar-btn:active {
+                background-color: #7aa4e8;
+                transform: scale(0.98);
+            }
+
+            .buscar-btn svg {
+                width: 1.2em;
+                height: 1.2em;
+                fill: #6a06b3;
+                flex-shrink: 0;
+            }
+    </style>
+</head>
+<body>
+
+    <button class="buscar-btn" id="btn">
+        <svg viewBox="0 0 383.83145 511.19171" xmlns="http://www.w3.org/2000/svg">
+            <g transform="translate(-53.79752,1.5426872)">
+                <path fill="#6a06b3"
+                      d="m 245.71324,104.79636 c 72.43048,0.009 136.39233,55.09432 147.61556,126.66666 2.97148,18.94969 2.36861,38.72288 -2.50293,57.33334 -2.96106,11.31197 -9.80168,22.98555 -10.3575,34.66666 -0.5979,12.56592 8.11987,22.86056 21.24487,22.4148 16.51261,-0.56083 21.90112,-18.78976 26.2205,-31.74813 11.13953,-33.41931 12.69364,-69.7275 4.59086,-104 C 412.21731,124.23544 334.00841,62.181885 245.71324,62.12968 c 0,-16.259888 6.12264,-47.629069 -8.19462,-59.0629069 -10.04938,-8.025472 -21.71293,-4.685506 -30.47205,3.234375 -17.62288,15.9344079 -33.86954,33.6921389 -50.66666,50.4951989 -7.42234,7.424967 -17.16392,15.217203 -17.16392,26.666668 0,11.44946 9.74162,19.241745 17.16392,26.666675 16.77079,16.77673 32.93621,34.71403 50.66666,50.47205 8.67556,7.71045 20.56572,10.9989 30.47205,3.23523 14.35016,-11.24634 8.19462,-42.91403 8.19462,-59.04061 m 0,341.33333 c 0,16.08565 -6.20115,47.94153 8.17232,59.04065 10.80318,8.34212 22.85067,3.97384 31.82768,-4.45886 16.91103,-15.88562 32.92967,-32.83903 49.33333,-49.24846 7.42229,-7.42488 17.1639,-15.2172 17.1639,-26.66666 0,-11.44947 -9.74157,-19.24174 -17.1639,-26.66667 -16.77081,-16.77669 -32.93626,-34.71395 -50.66666,-50.47205 -8.72764,-7.75679 -20.52216,-10.93573 -30.49435,-3.23527 -14.37349,11.09917 -8.17232,42.955 -8.17232,59.04065 -72.41524,-0.009 -136.39665,-55.12056 -147.615568,-126.66666 -3.14465,-20.05428 -1.93202,-40.34882 3.126718,-60 2.71784,-10.55774 9.31873,-21.03536 9.72342,-32 0.44551,-12.07095 -8.72325,-22.65829 -21.234568,-22.23218 -16.588389,0.56494 -21.869843,18.51308 -26.22051,31.56551 -11.139419,33.41935 -12.693664,69.72744 -4.590876,104 20.289749,85.82007 98.564564,147.94747 186.811384,148 z" />
+            </g>
+        </svg>
+        Buscar Dispositivo
+    </button>
+
+    <script>
+        const btn = document.getElementById('btn');
+
+        // Escala el texto e icono según el tamaño real del botón
+        function adjustFontSize() {
+            const w = btn.offsetWidth;
+            const h = btn.offsetHeight;
+            const size = Math.min(w * 0.10, h * 0.38);
+            btn.style.fontSize = size + 'px';
+        }
+
+        window.addEventListener('load', adjustFontSize);
+
+        if (window.ResizeObserver) {
+            new ResizeObserver(adjustFontSize).observe(btn);
+        } else {
+            window.addEventListener('resize', adjustFontSize);
+        }
+
+        function setup(htmlComponent) {
+            btn.addEventListener('click', function () {
+                htmlComponent.sendEventToMATLAB('ButtonClicked');
+            });
+        }
+    </script>
+
+</body>
+</html>
