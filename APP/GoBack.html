@@ -12,94 +12,137 @@
         html, body {
             width: 100%;
             height: 100%;
+            max-width: 100%;
+            max-height: 100%;
             overflow: hidden;
             background: transparent;
+            scrollbar-width: none;
         }
+
+            html::-webkit-scrollbar,
+            body::-webkit-scrollbar {
+                display: none;
+            }
 
         body {
             display: flex;
-            align-items: center;
-            justify-content: center;
+            align-items: stretch;
+            justify-content: stretch;
+            overflow: hidden;
+            padding: 3px;
+        }
+
+        :root {
+            --btn-bg: #DDE3F0;
+            --btn-text: #454C63;
+            --btn-border-color: transparent;
+            --btn-border-width: 0px;
+            --btn-border-radius: 50px;
         }
 
         .back-btn {
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 2vw;
-            background-color: #CC0000;
+            flex: 1;
+            min-width: 0;
+            min-height: 0;
+            background-color: var(--btn-bg);
             border: none;
-            border-radius: 50vmin;
-            width: 96%;
-            height: 86%;
-            padding: 0 4vw 0 1.5vw;
+            box-shadow: inset 0 0 0 var(--btn-border-width) var(--btn-border-color);
+            border-radius: var(--btn-border-radius);
             cursor: pointer;
-            transition: background-color 0.18s ease, transform 0.1s ease;
+            user-select: none;
+            transition: background-color 0.15s ease, transform 0.1s ease;
+            outline: none;
+            overflow: hidden;
         }
 
             .back-btn:hover {
-                background-color: #AA0000;
+                background-color: color-mix(in srgb, var(--btn-bg) 85%, black);
             }
 
             .back-btn:active {
-                transform: scale(0.96);
-                background-color: #880000;
+                background-color: color-mix(in srgb, var(--btn-bg) 72%, black);
+                transform: scale(0.98);
             }
 
-        .circle {
-            /* usa vh para que no desborde el alto del botón */
-            width: 7vh;
-            height: 7vh;
-            min-width: 20px;
-            min-height: 20px;
-            background: white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        .arrow {
             flex-shrink: 0;
+            display: block;
         }
 
-            .circle svg {
-                width: 55%;
-                height: 55%;
-            }
-
         .label {
-            color: white;
-            font-family: 'Arial Black', Arial, sans-serif;
-            font-size: 9vw; /* escala con el ANCHO del iframe */
-            font-weight: 900;
-            letter-spacing: 0.12em;
-            text-transform: uppercase;
+            color: var(--btn-text);
+            font-family: Arial, sans-serif;
+            font-weight: 700;
             white-space: nowrap;
+            line-height: 1;
         }
     </style>
 </head>
 <body>
 
-    <button class="back-btn" id="matlab-btn">
-        <span class="circle">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#CC0000" stroke-width="3"
-                 stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="15 18 9 12 15 6"></polyline>
-            </svg>
-        </span>
-        <span class="label">BACK</span>
+    <button class="back-btn" id="mainBtn">
+        <svg class="arrow" id="arrow" viewBox="0 0 24 24" fill="none"
+             stroke="#454C63" stroke-width="2.5"
+             stroke-linecap="round" stroke-linejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        <span class="label" id="label">Back</span>
     </button>
 
-    <script type="text/javascript">
+    <script>
+        var btn = document.getElementById('mainBtn');
+        var lbl = document.getElementById('label');
+        var arrow = document.getElementById('arrow');
+        var root = document.documentElement;
+
+        function adjustSize() {
+            var h = btn.offsetHeight;
+            // la fuente es siempre el 45% del alto — nunca desborda
+            var fs = h * 0.45;
+
+            lbl.style.fontSize = fs + 'px';
+            arrow.style.width = fs + 'px';
+            arrow.style.height = fs + 'px';
+            btn.style.gap = (fs * 0.25) + 'px';
+            arrow.setAttribute('stroke-width', Math.max(1.5, fs * 0.10));
+        }
+
+        window.addEventListener('load', adjustSize);
+        if (window.ResizeObserver) {
+            new ResizeObserver(adjustSize).observe(btn);
+        } else {
+            window.addEventListener('resize', adjustSize);
+        }
+
+        function setStyle(options) {
+            if (!options) return;
+            if (options.bgColor !== undefined) root.style.setProperty('--btn-bg', options.bgColor);
+            if (options.textColor !== undefined) {
+                root.style.setProperty('--btn-text', options.textColor);
+                arrow.setAttribute('stroke', options.textColor);
+            }
+            if (options.borderColor !== undefined) root.style.setProperty('--btn-border-color', options.borderColor);
+            if (options.borderWidth !== undefined) root.style.setProperty('--btn-border-width', options.borderWidth);
+            if (options.borderRadius !== undefined) root.style.setProperty('--btn-border-radius', options.borderRadius);
+            if (options.label !== undefined) { lbl.textContent = options.label; adjustSize(); }
+        }
+
         var _id = "";
 
         function setup(htmlComponent) {
-            htmlComponent.addEventListener("DataChanged", function () {
-                if (htmlComponent.Data && htmlComponent.Data.id) {
-                    _id = htmlComponent.Data.id;
-                }
+            htmlComponent.addEventListener('DataChanged', function () {
+                var data = htmlComponent.Data;
+                if (!data) return;
+                if (data.id !== undefined) _id = data.id;
+                setStyle(data);
             });
 
-            document.getElementById("matlab-btn").addEventListener("click", function () {
-                htmlComponent.sendEventToMATLAB("buttonClicked", { id: _id });
+            btn.addEventListener('click', function () {
+                htmlComponent.sendEventToMATLAB('buttonClicked', { id: _id });
             });
         }
     </script>
