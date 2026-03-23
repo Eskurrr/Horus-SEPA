@@ -12,8 +12,6 @@
         html, body {
             width: 100%;
             height: 100%;
-            max-width: 100%;
-            max-height: 100%;
             overflow: hidden;
             background: transparent;
             scrollbar-width: none;
@@ -26,123 +24,94 @@
 
         body {
             display: flex;
-            align-items: stretch;
-            justify-content: stretch;
-            overflow: hidden;
-            padding: 3px;
+            align-items: center;
+            justify-content: center;
         }
 
-        :root {
-            --btn-bg: #DDE3F0;
-            --btn-text: #454C63;
-            --btn-border-color: transparent;
-            --btn-border-width: 0px;
-            --btn-border-radius: 50px;
-        }
-
-        .back-btn {
+        .btn-wrap {
+            position: relative;
             display: flex;
             align-items: center;
             justify-content: center;
-            flex: 1;
-            min-width: 0;
-            min-height: 0;
-            background-color: var(--btn-bg);
-            border: none;
-            box-shadow: inset 0 0 0 var(--btn-border-width) var(--btn-border-color);
-            border-radius: var(--btn-border-radius);
+            /* ocupa el menor lado del iframe para ser siempre circular */
+            width: 90vmin;
+            height: 90vmin;
             cursor: pointer;
-            user-select: none;
-            transition: background-color 0.15s ease, transform 0.1s ease;
+            background: none;
+            border: none;
             outline: none;
-            overflow: hidden;
+            padding: 0;
+            -webkit-appearance: none;
         }
 
-            .back-btn:hover {
-                background-color: color-mix(in srgb, var(--btn-bg) 85%, black);
+            /* círculo semitransparente — invisible por defecto */
+            .btn-wrap::before {
+                content: '';
+                position: absolute;
+                inset: 0;
+                border-radius: 50%;
+                background: rgba(69, 76, 99, 0.12);
+                transform: scale(0.5);
+                opacity: 0;
+                transition: opacity 0.18s ease, transform 0.18s ease;
+                pointer-events: none;
             }
 
-            .back-btn:active {
-                background-color: color-mix(in srgb, var(--btn-bg) 72%, black);
-                transform: scale(0.98);
+            /* aparece en hover */
+            .btn-wrap:hover::before {
+                opacity: 1;
+                transform: scale(1);
             }
 
-        .arrow {
-            flex-shrink: 0;
-            display: block;
-        }
+            /* más opaco y flecha más pequeña al hacer clic */
+            .btn-wrap:active::before {
+                opacity: 1;
+                transform: scale(1);
+                background: rgba(69, 76, 99, 0.22);
+            }
 
-        .label {
-            color: var(--btn-text);
-            font-family: Arial, sans-serif;
-            font-weight: 700;
-            white-space: nowrap;
-            line-height: 1;
+            .btn-wrap:active .arrow-icon {
+                transform: scale(0.78);
+            }
+
+        /* la flecha */
+        .arrow-icon {
+            width: 55%;
+            height: 55%;
+            fill: #ff6a6a;
+            transition: transform 0.15s ease;
+            position: relative;
+            z-index: 1;
         }
     </style>
 </head>
 <body>
 
-    <button class="back-btn" id="mainBtn">
-        <svg class="arrow" id="arrow" viewBox="0 0 24 24" fill="none"
-             stroke="#454C63" stroke-width="2.5"
-             stroke-linecap="round" stroke-linejoin="round">
-            <line x1="19" y1="12" x2="5" y2="12"></line>
-            <polyline points="12 19 5 12 12 5"></polyline>
+    <button class="btn-wrap" id="mainBtn">
+        <svg class="arrow-icon" viewBox="0 0 869.959 869.958"
+             xmlns="http://www.w3.org/2000/svg">
+            <path d="M146.838,484.584c10.271,10.395,23.804,15.6,37.347,15.6c13.329,0,26.667-5.046,36.897-15.155
+      c20.625-20.379,20.825-53.62,0.445-74.245l-41.688-42.191h423.78c88.963,0,161.34,72.376,161.34,161.339v4.32
+      c0,43.096-16.782,83.61-47.255,114.084c-20.503,20.502-20.503,53.744,0,74.246c10.251,10.251,23.688,15.377,37.123,15.377
+      c13.435,0,26.872-5.125,37.123-15.377c50.305-50.306,78.009-117.188,78.009-188.331v-4.32
+      c0-71.142-27.704-138.026-78.009-188.331c-50.306-50.305-117.189-78.009-188.331-78.009h-424.99l42.25-41.747
+      c20.625-20.379,20.825-53.62,0.445-74.245c-20.376-20.624-53.618-20.825-74.244-0.445L15.601,277.068
+      c-9.905,9.787-15.517,23.107-15.6,37.03c-0.084,13.924,5.367,27.31,15.154,37.215L146.838,484.584z" />
         </svg>
-        <span class="label" id="label">Back</span>
     </button>
 
-    <script>
-        var btn = document.getElementById('mainBtn');
-        var lbl = document.getElementById('label');
-        var arrow = document.getElementById('arrow');
-        var root = document.documentElement;
-
-        function adjustSize() {
-            var h = btn.offsetHeight;
-            // la fuente es siempre el 45% del alto — nunca desborda
-            var fs = h * 0.45;
-
-            lbl.style.fontSize = fs + 'px';
-            arrow.style.width = fs + 'px';
-            arrow.style.height = fs + 'px';
-            btn.style.gap = (fs * 0.25) + 'px';
-            arrow.setAttribute('stroke-width', Math.max(1.5, fs * 0.10));
-        }
-
-        window.addEventListener('load', adjustSize);
-        if (window.ResizeObserver) {
-            new ResizeObserver(adjustSize).observe(btn);
-        } else {
-            window.addEventListener('resize', adjustSize);
-        }
-
-        function setStyle(options) {
-            if (!options) return;
-            if (options.bgColor !== undefined) root.style.setProperty('--btn-bg', options.bgColor);
-            if (options.textColor !== undefined) {
-                root.style.setProperty('--btn-text', options.textColor);
-                arrow.setAttribute('stroke', options.textColor);
-            }
-            if (options.borderColor !== undefined) root.style.setProperty('--btn-border-color', options.borderColor);
-            if (options.borderWidth !== undefined) root.style.setProperty('--btn-border-width', options.borderWidth);
-            if (options.borderRadius !== undefined) root.style.setProperty('--btn-border-radius', options.borderRadius);
-            if (options.label !== undefined) { lbl.textContent = options.label; adjustSize(); }
-        }
-
+    <script type="text/javascript">
         var _id = "";
 
         function setup(htmlComponent) {
-            htmlComponent.addEventListener('DataChanged', function () {
-                var data = htmlComponent.Data;
-                if (!data) return;
-                if (data.id !== undefined) _id = data.id;
-                setStyle(data);
+            htmlComponent.addEventListener("DataChanged", function () {
+                if (htmlComponent.Data && htmlComponent.Data.id) {
+                    _id = htmlComponent.Data.id;
+                }
             });
 
-            btn.addEventListener('click', function () {
-                htmlComponent.sendEventToMATLAB('buttonClicked', { id: _id });
+            document.getElementById("mainBtn").addEventListener("click", function () {
+                htmlComponent.sendEventToMATLAB("buttonClicked", { id: _id });
             });
         }
     </script>
