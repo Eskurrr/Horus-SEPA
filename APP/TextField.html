@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            background: transparent;
+            overflow: hidden;
+            display: flex;
+            align-items: flex-end;
+        }
+
+        .mfield {
+            position: relative;
+            width: calc(100% - 16px);
+            margin: 0 8px 4px 8px;
+        }
+
+            .mfield input {
+                width: 100%;
+                padding: 0 14px;
+                font-size: inherit;
+                border: 1.5px solid #fff;
+                border-radius: 8px;
+                background: transparent;
+                color: #fff;
+                outline: none;
+                transition: border-color 0.2s;
+            }
+
+                .mfield input:focus {
+                    border-color: #6C5CE7;
+                    box-shadow: 0 0 0 3px rgba(108,92,231,0.15);
+                }
+
+            .mfield label {
+                position: absolute;
+                left: 12px;
+                top: 50%;
+                transform: translateY(-50%);
+                font-size: inherit;
+                color: #fff;
+                background: transparent;
+                padding: 0 4px;
+                pointer-events: none;
+                transition: top 0.18s, font-size 0.18s, color 0.18s;
+                line-height: 1;
+            }
+
+            .mfield input:focus + label,
+            .mfield input:not(:placeholder-shown) + label {
+                top: 0;
+                transform: translateY(-100%);
+                font-size: 0.65em;
+                color: #6C5CE7;
+            }
+    </style>
+</head>
+<body>
+
+    <div class="mfield">
+        <input type="text" placeholder=" " />
+        <label>Texto</label>
+    </div>
+
+    <script type="text/javascript">
+        var input = document.querySelector('.mfield input');
+        var label = document.querySelector('.mfield label');
+
+        function scale() {
+            var totalH = window.innerHeight;
+            document.body.style.fontSize = (totalH * 0.28) + 'px';
+            input.style.height = (totalH * 0.62) + 'px';
+        }
+
+        scale();
+        window.addEventListener('resize', scale);
+
+        function setup(htmlComponent) {
+
+            htmlComponent.addEventListener("DataChanged", function () {
+                var data = htmlComponent.Data;
+                if (!data) return;
+
+                // Configurar tipo: 'text' o 'password'
+                // app.MiUihtml.Data = struct('type', 'password', 'label', 'Contrasena')
+                if (data.type) input.type = data.type;
+                if (data.label) label.textContent = data.label;
+
+                // Escribir un valor en el campo desde MATLAB
+                // app.MiUihtml.Data = struct('set', 'Hola mundo')
+                if (typeof data.set === 'string') {
+                    input.value = data.set;
+                    htmlComponent.Data = { value: data.set };
+                }
+
+                // Vaciar el campo desde MATLAB
+                // app.MiUihtml.Data = struct('clear', true)
+                if (data.clear === true) {
+                    input.value = '';
+                    htmlComponent.Data = { value: '' };
+                }
+            });
+
+            // Inicializa Data para que MATLAB siempre encuentre .value
+            htmlComponent.Data = { value: '' };
+
+            input.addEventListener('input', function () {
+                htmlComponent.Data = { value: input.value };
+            });
+        }
+    </script>
+
+</body>
+</html>
