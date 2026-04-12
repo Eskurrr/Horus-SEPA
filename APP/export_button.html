@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: transparent;
+            font-family: Georgia, 'Palatino Linotype', Palatino, 'Book Antiqua', serif;
+        }
+
+        :root {
+            --btn-h: 42px;
+        }
+
+        .root {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* ── Fila del botón (siempre arriba) ── */
+        .btn-row {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: var(--btn-h);
+            display: flex;
+        }
+
+        .btn-export {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.45em;
+            height: 100%;
+            background: #b3a8d8;
+            color: #fff;
+            border: none;
+            border-right: 1px solid rgba(255,255,255,0.35);
+            border-radius: 8px 0 0 8px;
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            user-select: none;
+            white-space: nowrap;
+            overflow: hidden;
+            transition: background 0.15s;
+        }
+
+            .btn-export:hover {
+                background: #a096cc;
+            }
+
+            .btn-export:active {
+                background: #9289c0;
+            }
+
+        .btn-arrow {
+            width: 26%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #b3a8d8;
+            border: none;
+            border-left: 1px solid rgba(255,255,255,0.25);
+            border-radius: 0 8px 8px 0;
+            cursor: pointer;
+            user-select: none;
+            flex-shrink: 0;
+            transition: background 0.15s;
+        }
+
+            .btn-arrow:hover {
+                background: #a096cc;
+            }
+
+            .btn-arrow:active {
+                background: #9289c0;
+            }
+
+            .btn-arrow svg {
+                color: rgba(255,255,255,0.85);
+                transition: transform 0.2s ease;
+            }
+
+            .btn-arrow.open svg {
+                transform: rotate(180deg);
+            }
+
+        /* ── Dropdown (en el espacio libre bajo el botón) ── */
+        .dropdown {
+            position: absolute;
+            top: var(--btn-h);
+            left: 0;
+            right: 0;
+            background: #fff;
+            border: 1px solid #e2ddf2;
+            border-top: none;
+            border-radius: 0 0 10px 10px;
+            overflow: hidden;
+            box-shadow: 0 6px 20px rgba(130,110,200,0.18);
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(-4px);
+            transition: opacity 0.16s ease, transform 0.16s ease;
+        }
+
+            .dropdown.open {
+                opacity: 1;
+                pointer-events: all;
+                transform: translateY(0);
+            }
+
+        .dropdown-label {
+            font-size: 9px;
+            font-weight: 600;
+            letter-spacing: 0.13em;
+            text-transform: uppercase;
+            color: #a89ecb;
+            padding: 7px 14px 4px;
+            border-bottom: 1px solid #f0ecfa;
+        }
+
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            cursor: pointer;
+            border-bottom: 1px solid #f5f3fc;
+            transition: background 0.12s;
+        }
+
+            .dropdown-item:last-child {
+                border-bottom: none;
+            }
+
+            .dropdown-item:hover {
+                background: #f3f0fb;
+            }
+
+                .dropdown-item:hover .item-icon {
+                    color: #9084c8;
+                }
+
+                .dropdown-item:hover .item-title {
+                    color: #6a5aad;
+                }
+
+        .item-icon {
+            color: #b3a8d8;
+            flex-shrink: 0;
+            transition: color 0.12s;
+        }
+
+        .item-text {
+            display: flex;
+            flex-direction: column;
+            gap: 1px;
+        }
+
+        .item-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: #4a4060;
+            transition: color 0.12s;
+        }
+
+        .item-sub {
+            font-size: 10px;
+            font-weight: 400;
+            color: #b0a8c8;
+        }
+    </style>
+</head>
+<body>
+    <div class="root">
+
+        <div class="btn-row">
+            <button class="btn-export" id="btnMain" onclick="toggleMenu()">
+                <svg id="iconMain" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                    <polyline points="7 10 12 15 17 10" />
+                    <line x1="12" y1="15" x2="12" y2="3" />
+                </svg>
+                EXPORT
+            </button>
+            <button class="btn-arrow" id="btnArrow" onclick="toggleMenu()">
+                <svg id="iconArrow" width="11" height="11" viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="6 9 12 15 18 9" />
+                </svg>
+            </button>
+        </div>
+
+        <div class="dropdown" id="dropdown">
+            <div class="dropdown-label">Formato</div>
+
+            <div class="dropdown-item" onclick="exportAs('csv')">
+                <svg class="item-icon" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="3" width="18" height="18" rx="2" />
+                    <line x1="3" y1="9" x2="21" y2="9" />
+                    <line x1="3" y1="15" x2="21" y2="15" />
+                    <line x1="9" y1="9" x2="9" y2="21" />
+                </svg>
+                <div class="item-text">
+                    <span class="item-title">CSV</span>
+                    <span class="item-sub">Tabla de valores separados</span>
+                </div>
+            </div>
+
+            <div class="dropdown-item" onclick="exportAs('pdf')">
+                <svg class="item-icon" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                    <polyline points="14 2 14 8 20 8" />
+                    <path d="M9 13h2a1 1 0 0 1 0 2H9v-2z" />
+                    <path d="M13 13h1a2 2 0 0 1 0 4h-1v-4z" />
+                    <line x1="17" y1="13" x2="17" y2="17" />
+                    <line x1="17" y1="15" x2="19" y2="15" />
+                </svg>
+                <div class="item-text">
+                    <span class="item-title">PDF</span>
+                    <span class="item-sub">Informe en PDF</span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script type="text/javascript">
+        let isOpen = false;
+        let _htmlComponent = null;
+
+        function setup(htmlComponent) {
+            _htmlComponent = htmlComponent;
+            document.addEventListener('click', function (e) {
+                if (isOpen && !e.target.closest('.btn-row')) closeMenu();
+            });
+        }
+
+        function toggleMenu() { isOpen ? closeMenu() : openMenu(); }
+
+        function openMenu() {
+            isOpen = true;
+            document.getElementById('dropdown').classList.add('open');
+            document.getElementById('btnArrow').classList.add('open');
+        }
+
+        function closeMenu() {
+            isOpen = false;
+            document.getElementById('dropdown').classList.remove('open');
+            document.getElementById('btnArrow').classList.remove('open');
+        }
+
+        function exportAs(format) {
+            closeMenu();
+            if (_htmlComponent) _htmlComponent.sendEventToMATLAB('ExportSelected', format);
+        }
+
+        // Escala botón y dropdown según el tamaño real del uihtml
+        new ResizeObserver(() => {
+            const totalH = document.documentElement.clientHeight;
+            const totalW = document.documentElement.clientWidth;
+
+            // Altura del botón: 30% del total, entre 24 y 60px
+            const btnH = Math.min(Math.max(totalH * 0.30, 24), 60);
+            document.querySelector('.btn-row').style.height = btnH + 'px';
+            document.documentElement.style.setProperty('--btn-h', btnH + 'px');
+
+            // Fuente
+            const fs = Math.min(Math.max(btnH * 0.24, 7), 15);  // antes 0.36
+            const br = Math.round(btnH * 0.2) + 'px';
+
+            document.getElementById('btnMain').style.fontSize = fs + 'px';
+            document.getElementById('btnMain').style.borderRadius = `${br} 0 0 ${br}`;
+            document.getElementById('btnArrow').style.borderRadius = `0 ${br} ${br} 0`;
+
+            const si = Math.round(fs * 0.9);   // antes 1.05
+            document.getElementById('iconMain').setAttribute('width', si);
+            document.getElementById('iconMain').setAttribute('height', si);
+            const sa = Math.round(fs * 0.6);   // antes 0.7
+            document.getElementById('iconArrow').setAttribute('width', sa);
+            document.getElementById('iconArrow').setAttribute('height', sa);
+
+            // Dropdown proporcional
+            const dfs = Math.round(fs * 0.90);   // antes 0.92
+            const dsub = Math.round(fs * 0.68);   // antes 0.70
+            const dlbl = Math.round(fs * 0.58);   // antes 0.60
+            const dpv = Math.round(btnH * 0.18); // antes 0.22
+            const dph = Math.round(btnH * 0.25); // antes 0.30
+            const dig = Math.round(fs * 1.00);  // antes 1.10
+            const dgap = Math.round(fs * 0.50);  // antes 0.55
+
+            document.querySelector('.dropdown-label').style.fontSize = dlbl + 'px';
+            document.querySelectorAll('.item-title').forEach(e => e.style.fontSize = dfs + 'px');
+            document.querySelectorAll('.item-sub').forEach(e => e.style.fontSize = dsub + 'px');
+            document.querySelectorAll('.dropdown-item').forEach(e => {
+                e.style.padding = `${dpv}px ${dph}px`;
+                e.style.gap = dgap + 'px';
+            });
+            document.querySelectorAll('.item-icon').forEach(e => {
+                e.setAttribute('width', dig);
+                e.setAttribute('height', dig);
+            });
+        }).observe(document.documentElement);
+    </script>
+</body>
+</html>
