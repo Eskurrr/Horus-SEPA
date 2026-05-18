@@ -1,11 +1,11 @@
 <?xml version="1.0"?>
 <WLANProfile xmlns="http://www.microsoft.com/networking/WLAN/profile/v1">
 
-    <name>ESP32SEPA</name>
+    <name>vodafoneBA2021</name>
 
     <SSIDConfig>
         <SSID>
-            <name>ESP32SEPA</name>
+            <name>vodafoneBA2021</name>
         </SSID>
     </SSIDConfig>
 
@@ -24,7 +24,7 @@
             <sharedKey>
                 <keyType>passPhrase</keyType>
                 <protected>false</protected>
-                <keyMaterial>zeri3333</keyMaterial>
+                <keyMaterial>00000000</keyMaterial>
             </sharedKey>
 
         </security>
