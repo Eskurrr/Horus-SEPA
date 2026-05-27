@@ -1,16 +1,1 @@
-{
-  "usuarios": [
-    {
-      "username": "admin",
-      "password": "admin"
-    },
-    {
-      "username": "ESKURR",
-      "password": "jeje"
-    },
-    {
-      "username": "emiliamernes",
-      "password": "dukicornudo"
-    }
-  ]
-}
+{"usuarios":[{"username":"admin","password":"admin"},{"username":"ESKURR","password":"jeje"},{"username":"emiliamernes","password":"dukicornudo"},{"username":"ADMIN","password":"ADMIN"},{"username":"Nathy","password":"Peludo"}]}
