@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: #ffffff;
+            padding: 1.2vw 1.6vw 0.5vw;
+            font-size: clamp(10px, 2vw, 17px);
+        }
+
+        .seccion {
+            font-size: 0.68em;
+            font-weight: bold;
+            color: #5b0ecc;
+            text-transform: uppercase;
+            letter-spacing: 0.07em;
+            margin: 0.65em 0 0.2em;
+            padding-bottom: 0.15em;
+            border-bottom: 1.5px solid #e0dcf8;
+        }
+
+            .seccion:first-child {
+                margin-top: 0.05em;
+            }
+
+        .fila {
+            display: flex;
+            align-items: baseline;
+            gap: 0.35em;
+            padding: 0.18em 0;
+            border-bottom: 1px solid #f5f3ff;
+            flex-wrap: nowrap;
+        }
+
+        .etiqueta {
+            font-weight: bold;
+            color: #1a1028;
+            font-size: 0.92em;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .valor {
+            font-size: 0.92em;
+            font-weight: normal;
+            white-space: nowrap;
+        }
+
+        .sangria .etiqueta {
+            padding-left: 1.8em;
+            font-weight: normal;
+            color: #444444;
+        }
+
+        .ok {
+            color: #16a34a;
+        }
+
+        .warn {
+            color: #d97706;
+        }
+
+        .bad {
+            color: #dc2626;
+        }
+
+        .neu {
+            color: #555555;
+        }
+
+        #placeholder {
+            color: #bbbbbb;
+            font-size: 0.9em;
+            margin-top: 1.5em;
+            text-align: center;
+        }
+    </style>
+
+    <script type="text/javascript">
+
+        function semaforo(ok, malo) {
+            if (ok) return 'ok';
+            if (malo) return 'bad';
+            return 'warn';
+        }
+
+        function fila(etiqueta, valor, cls, sangria) {
+            var s = sangria ? ' sangria' : '';
+            return '<div class="fila' + s + '">'
+                + '<span class="etiqueta">' + etiqueta + '</span>'
+                + '<span class="valor ' + (cls || 'neu') + '">' + valor + '</span>'
+                + '</div>';
+        }
+
+        function render(d) {
+            if (!d) {
+                document.getElementById('root').innerHTML =
+                    '<div id="placeholder">Sin datos de analisis</div>';
+                return;
+            }
+
+            var h = '';
+
+            /* PARAMETROS */
+            h += '<div class="seccion">Parametros</div>';
+            var durOk = (d.dur_val >= 30 && d.dur_val <= 120);
+            h += fila('Dur. media sacada:', d.dur_media, semaforo(durOk, false));
+            h += fila('Amplitud media:', d.amp_media, 'neu');
+            h += fila('Vel. pico media:', d.vel_media, 'neu');
+            h += fila('Derecha:', d.vel_der, 'neu', true);
+            h += fila('Izquierda:', d.vel_izq, 'neu', true);
+            var fixOk = (d.fix_val >= 150 && d.fix_val <= 600);
+            h += fila('Fijacion media:', d.fix_media, semaforo(fixOk, false));
+
+            /* MAIN SEQUENCE */
+            h += '<div class="seccion">Correlación de Spearman</div>';
+            var msVal = parseFloat(d.ms_val);
+            var msOk = (msVal >= 0.70);
+            var msMal = (msVal < 0.40 && !isNaN(msVal));
+            var msCls = isNaN(msVal) ? 'neu' : semaforo(msOk, msMal);
+            h += fila('Correlacion r:', d.ms_r, msCls);
+            h += fila('Estado:', d.ms_estado, msCls);
+
+            /* ASIMETRIA */
+            h += '<div class="seccion">Asimetria D / I</div>';
+            var asimOk = (Math.abs(d.asim_val) <= 0.25);
+            var asimCls = semaforo(asimOk, false);
+            h += fila('Indice D/I:', d.asim_idx, asimCls);
+            h += fila('Patron:', d.asim_texto, asimCls);
+
+            /* PARPADEO */
+            h += '<div class="seccion">Parpadeo</div>';
+            var blinkOk = (d.blink_val >= 8 && d.blink_val <= 25);
+            var blinkCls = semaforo(blinkOk, false);
+            h += fila('Tasa:', d.blink_rate, blinkCls);
+            h += fila('Estado:', d.blink_estado, blinkCls);
+
+            /* ALERTAS (solo si hay) */
+            if (d.alerta_dur && d.alerta_dur !== '') {
+                h += '<div class="seccion">Alertas</div>';
+                h += fila('Sacadas largas:', d.alerta_dur, 'warn');
+            }
+
+            document.getElementById('root').innerHTML = h;
+        }
+
+        function setup(htmlComponent) {
+            htmlComponent.addEventListener("DataChanged", function (event) {
+                render(htmlComponent.Data);
+            });
+        }
+
+    </script>
+</head>
+<body>
+    <div id="root">
+        <div id="placeholder">Sin datos de analisis</div>
+    </div>
+</body>
+</html>
